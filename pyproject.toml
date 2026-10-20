@@ -8,7 +8,7 @@ requires-python = ">=3.12"
 dependencies = ["numpy==2.5.4"]
 
 [dependency-groups]
-dev = ["ruff"]
+dev = ["pyyaml", "ruff"]
 
 [tool.uv]
 package = false

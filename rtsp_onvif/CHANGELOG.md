@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Names and descriptions for every setting, in English and Ukrainian.
+
 ## 1.0.1
 
 - New cameras no longer get a leading space in their Protect name. Protect names a camera "<Manufacturer> <Model>", and go2rtc left the manufacturer empty; the add-on now reports `RTSP to ONVIF` and the camera's `model` (its name by default). Rename the camera in Protect as you like.

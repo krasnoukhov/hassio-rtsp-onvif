@@ -1,10 +1,74 @@
 configuration:
   rtsp_port:
-    name: RTSP port
-    description: The RTSP server Protect pulls every camera from, at rtsp://<host>:<port>/<camera name>.
+    name: "RTSP port"
+    description: "The RTSP server Protect pulls every camera from, at rtsp://<host>:<port>/<camera name>."
   api_port:
-    name: go2rtc API port
-    description: Local only (127.0.0.1). Default 1985; change it if that port is taken.
+    name: "go2rtc API port"
+    description: "Local only (127.0.0.1). Change it if 1985 is taken."
   cameras:
-    name: Cameras
-    description: One entry per camera. Each needs its own name and ONVIF port. See the Documentation tab for every setting.
+    name: "Cameras"
+    description: "One entry per camera. Each needs its own name and ONVIF port."
+    fields:
+      name:
+        name: "Name"
+        description: "Lowercase letters, digits and _, starting with a letter. Also the stream path."
+      source:
+        name: "RTSP URL"
+        description: "The camera's stream, without the login."
+      onvif_port:
+        name: "ONVIF port"
+        description: "The port you adopt in Protect, as <host IP>:<port>. Each camera needs its own."
+      mode:
+        name: "Mode"
+        description: "continuous for always-on streams; battery for cameras that sleep until their own motion sensor wakes them."
+      motion:
+        name: "Motion detection"
+        description: "pixels (frame differences), objects (person, vehicle and animal detector) or off."
+      username:
+        name: "Username"
+        description: "The camera's RTSP login."
+      password:
+        name: "Password"
+        description: "The camera's RTSP password. It's kept out of the logs."
+      audio:
+        name: "Audio"
+        description: "Continuous mode: pass audio to Protect, re-encoded to AAC 16 kHz mono."
+      labels:
+        name: "Objects"
+        description: "Objects detection: comma-separated person, vehicle, animal. Birds count as animal."
+      min_score:
+        name: "Minimum score"
+        description: "Objects detection: the detector confidence (0-1) that starts an event."
+      sensitivity:
+        name: "Pixel sensitivity"
+        description: "The brightness change (1-255) that counts as a changed pixel."
+      min_area:
+        name: "Minimum changed area"
+        description: "The percent of the frame that has to change to count as motion."
+      max_area:
+        name: "Maximum changed area"
+        description: "Above this percent of the frame it's a lighting change, not motion."
+      hold_seconds:
+        name: "Event hold"
+        description: "How many seconds an event lasts after the last motion or detection."
+      probe_seconds:
+        name: "Wake check interval"
+        description: "Battery mode: seconds between checks for whether the camera woke up."
+      width:
+        name: "Width"
+        description: "Battery mode: the width of the stream sent to Protect."
+      height:
+        name: "Height"
+        description: "Battery mode: the height of the stream sent to Protect."
+      fps:
+        name: "Frame rate"
+        description: "Battery mode: frames per second of the stream sent to Protect."
+      save_frames:
+        name: "Save frames"
+        description: "Save the best frame of each wake (battery) or event (continuous) to /share/rtsp_onvif/<name>/, keeping the newest 500."
+      mac:
+        name: "MAC address"
+        description: "Reported to Protect, which tells cameras apart by MAC. Leave empty for an automatic one."
+      model:
+        name: "Model"
+        description: "Reported to Protect, which names a new camera 'RTSP to ONVIF <model>'. Defaults to the name."

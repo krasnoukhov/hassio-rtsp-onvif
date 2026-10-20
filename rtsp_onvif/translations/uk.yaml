@@ -1,0 +1,74 @@
+configuration:
+  rtsp_port:
+    name: "Порт RTSP"
+    description: "RTSP-сервер, з якого Protect бере кожну камеру: rtsp://<хост>:<порт>/<назва камери>."
+  api_port:
+    name: "Порт API go2rtc"
+    description: "Лише локально (127.0.0.1). Змініть, якщо порт 1985 зайнятий."
+  cameras:
+    name: "Камери"
+    description: "Один запис на камеру. Кожній потрібні власна назва й власний порт ONVIF."
+    fields:
+      name:
+        name: "Назва"
+        description: "Малі латинські літери, цифри та _, на початку літера. Це також шлях потоку."
+      source:
+        name: "RTSP-адреса"
+        description: "Потік камери, без логіна."
+      onvif_port:
+        name: "Порт ONVIF"
+        description: "Порт, який ви вказуєте в Protect як <IP хоста>:<порт>. У кожної камери свій."
+      mode:
+        name: "Режим"
+        description: "continuous для постійних потоків; battery для камер, які сплять, доки їх не розбудить власний датчик руху."
+      motion:
+        name: "Виявлення руху"
+        description: "pixels (різниця кадрів), objects (детектор людей, транспорту й тварин) або off."
+      username:
+        name: "Ім'я користувача"
+        description: "RTSP-логін камери."
+      password:
+        name: "Пароль"
+        description: "RTSP-пароль камери. У журнал він не потрапляє."
+      audio:
+        name: "Звук"
+        description: "Режим continuous: передавати звук у Protect, перекодований в AAC 16 кГц моно."
+      labels:
+        name: "Об'єкти"
+        description: "Для виявлення objects: через кому person, vehicle, animal. Птахи належать до animal."
+      min_score:
+        name: "Мінімальна впевненість"
+        description: "Для виявлення objects: впевненість детектора (0–1), з якої починається подія."
+      sensitivity:
+        name: "Чутливість пікселів"
+        description: "Зміна яскравості (1–255), з якої піксель вважається зміненим."
+      min_area:
+        name: "Мінімальна площа змін"
+        description: "Відсоток кадру, який має змінитися, щоб це вважалося рухом."
+      max_area:
+        name: "Максимальна площа змін"
+        description: "Якщо змінилося більше цього відсотка кадру, це зміна освітлення, а не рух."
+      hold_seconds:
+        name: "Тривалість події"
+        description: "Скільки секунд подія триває після останнього руху чи виявлення."
+      probe_seconds:
+        name: "Інтервал перевірки пробудження"
+        description: "Режим battery: скільки секунд між перевірками, чи прокинулася камера."
+      width:
+        name: "Ширина"
+        description: "Режим battery: ширина потоку для Protect."
+      height:
+        name: "Висота"
+        description: "Режим battery: висота потоку для Protect."
+      fps:
+        name: "Частота кадрів"
+        description: "Режим battery: кадрів за секунду в потоці для Protect."
+      save_frames:
+        name: "Зберігати кадри"
+        description: "Зберігати найкращий кадр кожного пробудження (battery) чи події (continuous) у /share/rtsp_onvif/<назва>/, лише останні 500."
+      mac:
+        name: "MAC-адреса"
+        description: "Передається в Protect, який розрізняє камери за MAC. Залиште порожнім, щоб призначити автоматично."
+      model:
+        name: "Модель"
+        description: "Передається в Protect, який називає нову камеру «RTSP to ONVIF <модель>». За замовчуванням — назва."
