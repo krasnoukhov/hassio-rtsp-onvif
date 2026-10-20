@@ -1,0 +1,26 @@
+[project]
+name = "hassio-rtsp-onvif"
+version = "1.0.0"
+description = "Home Assistant add-on: RTSP cameras, battery ones included, as ONVIF cameras for UniFi Protect"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = ["numpy==2.5.4"]
+
+[dependency-groups]
+dev = ["ruff"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+ignore = ["SIM108"]
+
+[tool.ruff.lint.per-file-ignores]
+# SOAP replies are long XML literals
+"rtsp_onvif/app/onvif.py" = ["E501"]

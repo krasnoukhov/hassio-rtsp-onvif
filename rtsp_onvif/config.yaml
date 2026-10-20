@@ -1,0 +1,48 @@
+name: RTSP to ONVIF
+version: "1.0.0"
+slug: rtsp_onvif
+description: RTSP cameras, battery ones included, as ONVIF cameras with motion events for UniFi Protect
+url: https://github.com/krasnoukhov/hassio-rtsp-onvif
+arch:
+  - aarch64
+  - amd64
+image: ghcr.io/krasnoukhov/{arch}-hassio-rtsp-onvif
+host_network: true
+boot: auto
+startup: application
+map:
+  - type: share
+    read_only: false
+options:
+  rtsp_port: 8564
+  cameras:
+    - name: camera
+      source: rtsp://192.168.1.10:554/stream
+      onvif_port: 8000
+      mode: continuous
+      motion: pixels
+schema:
+  rtsp_port: port
+  api_port: port?
+  cameras:
+    - name: match(^[a-z][a-z0-9_]{0,31}$)
+      source: str
+      onvif_port: port
+      mode: list(continuous|battery)
+      motion: list(pixels|objects|off)
+      username: str?
+      password: password?
+      audio: bool?
+      labels: str?
+      min_score: float(0.05,1)?
+      sensitivity: int(1,255)?
+      min_area: float(0.01,100)?
+      max_area: float(1,100)?
+      hold_seconds: int(1,300)?
+      probe_seconds: float(0.5,60)?
+      width: int(160,3840)?
+      height: int(90,2160)?
+      fps: int(1,30)?
+      save_frames: bool?
+      mac: match(^([0-9a-f]{2}:){5}[0-9a-f]{2}$)?
+      model: str?

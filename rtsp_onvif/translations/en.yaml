@@ -1,0 +1,10 @@
+configuration:
+  rtsp_port:
+    name: RTSP port
+    description: The RTSP server Protect pulls every camera from, at rtsp://<host>:<port>/<camera name>.
+  api_port:
+    name: go2rtc API port
+    description: Local only (127.0.0.1). Default 1985; change it if that port is taken.
+  cameras:
+    name: Cameras
+    description: One entry per camera. Each needs its own name and ONVIF port. See the Documentation tab for every setting.
