@@ -45,7 +45,7 @@ Then in Protect, use **Add device → Advanced adoption** with `<Home Assistant 
 | `width`, `height`, `fps` | `1280`, `720`, `15` | Battery mode: the stream sent to Protect. |
 | `save_frames` | `false` | Save one JPEG per wake (battery) or per event (continuous) to `/share/rtsp_onvif/<name>/`, named by time, label and score, keeping the newest 500. Good for checking what the detector misses. |
 | `mac` | | The MAC address reported to Protect. The first camera reports the host's; the others get locally administered addresses next to it. |
-| `model` | `name` | The model name shown in Protect. |
+| `model` | `name` | The model reported to Protect. Protect names a new camera `RTSP to ONVIF <model>`; rename it there as you like. |
 
 ## Notes
 

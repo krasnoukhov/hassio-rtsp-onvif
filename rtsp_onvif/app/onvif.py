@@ -7,9 +7,10 @@ import re
 import threading
 import uuid
 from datetime import UTC, datetime, timedelta
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, quote
 
 SUB_TTL = timedelta(hours=1)
+MANUFACTURER = "RTSP to ONVIF"
 MAX_SUBS = 20
 
 NS = (
@@ -194,6 +195,10 @@ AUDIO_REPLIES = {
 }
 
 
+def _xml(text):
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def patch(op, xml, host, stream, model, mac, audio):
     """Adjust a go2rtc ONVIF reply for one camera (one ONVIF server per camera)."""
     ev = f"http://{host}/onvif/event_service"
@@ -238,7 +243,13 @@ def patch(op, xml, host, stream, model, mac, audio):
             xml,
         )
     elif op == "GetDeviceInformation":
-        xml = xml.replace("<tds:Model>go2rtc</tds:Model>", f"<tds:Model>{model}</tds:Model>")
+        # Protect names a new camera "<Manufacturer> <Model>"; go2rtc's empty manufacturer left a leading space.
+        xml = re.sub(
+            r"<tds:Manufacturer>[^<]*</tds:Manufacturer>", f"<tds:Manufacturer>{MANUFACTURER}</tds:Manufacturer>", xml
+        )
+        xml = re.sub(r"<tds:Model>[^<]*</tds:Model>", f"<tds:Model>{_xml(model)}</tds:Model>", xml)
+    elif op == "GetScopes":
+        xml = re.sub(r"onvif://www\.onvif\.org/name/[^<]*", f"onvif://www.onvif.org/name/{quote(model)}", xml)
     elif op == "GetSnapshotUri":
         # Protect sends an empty ProfileToken here.
         xml = xml.replace("src=</tt:Uri>", f"src={stream}</tt:Uri>")

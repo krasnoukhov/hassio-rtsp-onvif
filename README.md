@@ -37,7 +37,7 @@ uv run ruff format . && uv run ruff check .
 uv run python -m unittest discover -s tests -t .
 ```
 
-Pushing to `main` builds and publishes the images to `ghcr.io/krasnoukhov/{arch}-hassio-rtsp-onvif`. Bump `version` in `rtsp_onvif/config.yaml` to release; Home Assistant offers the update when the version changes.
+Pushing to `main` builds and publishes the images to `ghcr.io/krasnoukhov/{arch}-hassio-rtsp-onvif`. To release, bump `version` in `rtsp_onvif/config.yaml` and add a `## <version>` section to `rtsp_onvif/CHANGELOG.md`. CI then creates the GitHub release `v<version>` from that section, and Home Assistant offers the update.
 
 ## License
 

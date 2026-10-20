@@ -1,5 +1,5 @@
 name: RTSP to ONVIF
-version: "1.0.0"
+version: "1.0.1"
 slug: rtsp_onvif
 description: RTSP cameras, battery ones included, as ONVIF cameras with motion events for UniFi Protect
 url: https://github.com/krasnoukhov/hassio-rtsp-onvif

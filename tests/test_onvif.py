@@ -43,8 +43,18 @@ class PatchTest(unittest.TestCase):
         self.assertIn("<tt:HwAddress>02:00:00:00:00:01</tt:HwAddress>", xml)
         self.assertIn("<tt:Address>10.0.0.2</tt:Address>", xml)
 
-    def test_model_and_snapshot(self):
-        self.assertIn("<tds:Model>iPad</tds:Model>", patch("GetDeviceInformation", "<tds:Model>go2rtc</tds:Model>"))
+    def test_device_information_gives_protect_a_clean_name(self):
+        xml = patch("GetDeviceInformation", "<tds:Manufacturer></tds:Manufacturer>\t<tds:Model>go2rtc</tds:Model>")
+        self.assertIn("<tds:Manufacturer>RTSP to ONVIF</tds:Manufacturer>", xml)
+        self.assertIn("<tds:Model>iPad</tds:Model>", xml)
+        xml = onvif.patch("GetDeviceInformation", "<tds:Model>x</tds:Model>", "h:1", "s", "A & B", "m", False)
+        self.assertIn("<tds:Model>A &amp; B</tds:Model>", xml)
+
+    def test_name_scope(self):
+        xml = patch("GetScopes", "<tt:ScopeItem>onvif://www.onvif.org/name/go2rtc</tt:ScopeItem>")
+        self.assertIn("onvif://www.onvif.org/name/iPad</tt:ScopeItem>", xml)
+
+    def test_snapshot(self):
         xml = patch("GetSnapshotUri", "<tt:Uri>http://10.0.0.2:8000/api/frame.jpeg?src=</tt:Uri>")
         self.assertIn("src=ipad</tt:Uri>", xml)
 
