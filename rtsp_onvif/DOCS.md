@@ -51,6 +51,6 @@ Then in Protect, use **Add device → Advanced adoption** with `<Home Assistant 
 
 - **Recording mode:** use Detections in Protect. Adaptive needs a second, low-quality stream, which these cameras don't have, so it behaves like Detections. A Protect without a drive (for example a UDR with no microSD card) only records on motion anyway.
 - **Battery cameras:** each wake shows up in the log as `camera awake ... camera asleep after N s ... max scores`. The camera typically stops sending video several seconds before it drops the connection; the add-on closes the stream after 4 s without frames.
-- **Several cameras on one host:** Protect identifies cameras by MAC and expects each ONVIF camera at its own IP. The add-on reports a different MAC for each camera, but Protect may still refuse a second camera from the same IP. One camera per host always works.
+- **Several cameras on one host:** Protect identifies cameras by MAC. The add-on reports a different MAC for each camera, so Protect adopts each `<host IP>:<onvif_port>` as its own camera (tested with two cameras on one Home Assistant Yellow).
 - **Status:** `http://<host>:<onvif_port>/status` returns JSON: whether video is flowing, motion, scores, frame rate, and Protect's subscriptions.
 - The go2rtc API listens on `127.0.0.1:1985` (`api_port`). go2rtc's WebRTC module is off, because Home Assistant's own go2rtc uses 8555.

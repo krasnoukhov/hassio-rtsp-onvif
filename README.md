@@ -12,7 +12,7 @@ Object detection uses [Scrypted](https://github.com/koush/scrypted)'s YOLOv9c mo
 ## Install
 
 1. In Home Assistant: **Settings → Add-ons → Add-on store → ⋮ → Repositories**, and add `https://github.com/krasnoukhov/hassio-rtsp-onvif`.
-2. Install **RTSP to ONVIF**, set up your cameras on the **Configuration** tab (see the **Documentation** tab), and start it.
+2. Install **RTSP to ONVIF**, set up your cameras on the **Configuration** tab (see the **Documentation** tab), and start it. One add-on serves several cameras, each on its own ONVIF port.
 3. In Protect: **Settings → System → Discover 3rd-Party Cameras** on, then **Add device → Advanced adoption** with `<Home Assistant IP>:<onvif_port>`. Any username and password work.
 
 Images are built for `amd64` and `aarch64` (Raspberry Pi 4/CM4, Home Assistant Yellow and Green).
