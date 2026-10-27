@@ -426,9 +426,11 @@ class BatteryCamera(Camera):
         else:
             text = ("ASLEEP " + ago(time.time() - self.asleep_wall)) if self.asleep_wall else "ASLEEP"
         if text != self.overlay_text:
-            with open(self.overlay_file + ".tmp", "w") as f:
+            # A temp file per thread: two writers sharing one would replace it from under each other.
+            tmp = f"{self.overlay_file}.{threading.get_ident()}.tmp"
+            with open(tmp, "w") as f:
                 f.write(text)
-            os.replace(self.overlay_file + ".tmp", self.overlay_file)
+            os.replace(tmp, self.overlay_file)
             self.overlay_text = text
 
     def _on_tick(self, ended):
