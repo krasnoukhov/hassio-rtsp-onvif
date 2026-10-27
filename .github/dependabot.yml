@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  # Base image only: the pip pins in RUN lines aren't tracked
+  - package-ecosystem: "docker"
+    directory: "/rtsp_onvif"
+    schedule:
+      interval: "weekly"
