@@ -79,6 +79,27 @@ class BatteryTest(CameraTestCase):
         self.assertEqual(again.frame, cam.frame)  # restart keeps the frozen frame and the sleep time
         self.assertEqual(again.overlay_text, "ASLEEP 0m")
 
+    def test_overlay_concurrent_writes(self):
+        # The tick thread and a direct call can write at once.
+        o = opts()
+        cam = camera.BatteryCamera(o["cameras"][0], o, None, QUIET)
+        errors = []
+
+        def write():
+            for _ in range(500):
+                cam.overlay_text = None  # force a write
+                try:
+                    cam._overlay()
+                except OSError as e:
+                    errors.append(e)
+
+        threads = [threading.Thread(target=write) for _ in range(2)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        self.assertEqual(errors, [])
+
     def test_save_keeps_newest(self):
         o = opts(save_frames=True)
         cam = camera.BatteryCamera(o["cameras"][0], o, None, QUIET)
