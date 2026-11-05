@@ -54,6 +54,9 @@ configuration:
       probe_seconds:
         name: "Wake check interval"
         description: "Battery mode: seconds between checks for whether the camera woke up."
+      wake_entity:
+        name: "Wake entity"
+        description: "Battery mode: a Home Assistant entity (e.g. binary_sensor.robot_away) that wakes the camera while it's on, instead of a connection check. For sources that are always up, such as a stream from another go2rtc."
       width:
         name: "Width"
         description: "Battery mode: the width of the stream sent to Protect."

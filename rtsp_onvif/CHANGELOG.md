@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- New battery-mode setting `wake_entity`: a Home Assistant entity that wakes the camera while it's `on`, instead of a connection check. Use it for sources that never go down by themselves, such as a robot vacuum's camera from another go2rtc, woken while the robot is off its dock. The add-on now has access to Home Assistant's API to read that entity.
+- Fixed: two updates of a battery camera's `ASLEEP` label at the same moment could fail one of them.
+
 ## 1.0.2
 
 - Names and descriptions for every setting, in English and Ukrainian.

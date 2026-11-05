@@ -61,6 +61,7 @@ Home Assistant offers the update once `version` changes. Every push to `main` re
   - `objects` motion only runs on frames that changed by at least `min_area`.
 - **battery:**
   - A TCP connect probes the camera every `probe_seconds`. On a wake, the add-on decodes the camera directly.
+  - With `wake_entity`, the probe is that entity's state from Home Assistant's API (`ha_state`, needs `homeassistant_api`), and `_check_wake_entity` kills the decode once it's no longer `on`, since such a source never stalls. An unreadable state changes nothing.
   - An always-on x264 encoder (`BatteryCamera.output`) publishes `<name>` to go2rtc at a fixed frame rate. While the camera sleeps, it sends the dimmed last frame with a drawtext `ASLEEP <time>` label, read from a text file reloaded every second.
   - The last frame and the sleep time live in `/data/<name>/`.
 - **Events:** `Motion.hit` starts an event and keeps the best frame. `Motion.tick` ends it `hold_seconds` after the last hit, or `SLEEP_GRACE` after the video stops. The snapshot is the best frame during the event and for `SNAP_HOLD` after it.

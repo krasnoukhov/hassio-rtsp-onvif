@@ -1,10 +1,12 @@
 """Cameras: decode, look for motion, and (battery mode) keep a continuous stream going for Protect."""
 
+import json
 import os
 import socket
 import subprocess
 import threading
 import time
+import urllib.request
 from urllib.parse import urlparse
 
 from . import detect
@@ -37,6 +39,19 @@ def _load(path):
         with open(path, "rb") as f:
             return f.read()
     except OSError:
+        return None
+
+
+def ha_state(entity):
+    """The entity's state from Home Assistant (homeassistant_api in config.yaml), or None if it can't be read."""
+    req = urllib.request.Request(
+        f"http://supervisor/core/api/states/{entity}",
+        headers={"Authorization": f"Bearer {os.environ.get('SUPERVISOR_TOKEN', '')}"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=2) as r:
+            return json.load(r).get("state")
+    except (OSError, ValueError):
         return None
 
 
@@ -334,6 +349,7 @@ class BatteryCamera(Camera):
         self.last_seen = os.path.join(self.data_dir, "last_seen")
         self.overlay_file = f"/tmp/overlay_{self.name}.txt"
         self.wakes, self.out_frames = 0, 0
+        self.wake_entity, self.wake_checked = cfg["wake_entity"], 0.0
         self.live = _load(self.last_yuv)
         if self.live and len(self.live) != self.frame_size:
             self.live = None
@@ -364,6 +380,9 @@ class BatteryCamera(Camera):
         return {**super().status(), "wakes": self.wakes, "out_frames": self.out_frames}
 
     def reachable(self):
+        if self.wake_entity:
+            # The source is always up (e.g. another go2rtc); an entity says when it's worth watching.
+            return ha_state(self.wake_entity) == "on"
         # A sleeping camera doesn't answer at all; a TCP connect is the cheapest check.
         try:
             socket.create_connection(self.addr, timeout=1.5).close()
@@ -435,6 +454,19 @@ class BatteryCamera(Camera):
 
     def _on_tick(self, ended):
         self._overlay()
+        self._check_wake_entity()
+
+    def _check_wake_entity(self):
+        # Such a source never goes quiet by itself, so the entity turning off ends the wake.
+        # An unreadable state (Home Assistant restarting) leaves the stream as it is.
+        now = time.monotonic()
+        if not (self.wake_entity and self.alive and self.proc) or now - self.wake_checked < self.cfg["probe_seconds"]:
+            return
+        self.wake_checked = now
+        state = ha_state(self.wake_entity)
+        if state is not None and state != "on":
+            self.log(f"{self.wake_entity} is {state}, closing the stream")
+            self.proc.kill()
 
     def _overlay_filter(self):
         # Without the font drawtext would kill the encoder, so the label is optional.

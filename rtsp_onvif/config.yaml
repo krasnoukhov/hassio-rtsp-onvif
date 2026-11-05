@@ -1,5 +1,5 @@
 name: RTSP to ONVIF
-version: "1.0.2"
+version: "1.1.0"
 slug: rtsp_onvif
 description: RTSP cameras, battery ones included, as ONVIF cameras with motion events for UniFi Protect
 url: https://github.com/krasnoukhov/hassio-rtsp-onvif
@@ -8,6 +8,7 @@ arch:
   - amd64
 image: ghcr.io/krasnoukhov/{arch}-hassio-rtsp-onvif
 host_network: true
+homeassistant_api: true
 boot: auto
 startup: application
 map:
@@ -40,6 +41,7 @@ schema:
       max_area: float(1,100)?
       hold_seconds: int(1,300)?
       probe_seconds: float(0.5,60)?
+      wake_entity: str?
       width: int(160,3840)?
       height: int(90,2160)?
       fps: int(1,30)?

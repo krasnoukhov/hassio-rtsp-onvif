@@ -54,6 +54,9 @@ configuration:
       probe_seconds:
         name: "Інтервал перевірки пробудження"
         description: "Режим battery: скільки секунд між перевірками, чи прокинулася камера."
+      wake_entity:
+        name: "Сутність пробудження"
+        description: "Режим battery: сутність Home Assistant (наприклад, binary_sensor.robot_away), яка будить камеру, поки вона увімкнена, замість перевірки з'єднання. Для джерел, що працюють завжди, як-от потік з іншого go2rtc."
       width:
         name: "Ширина"
         description: "Режим battery: ширина потоку для Protect."

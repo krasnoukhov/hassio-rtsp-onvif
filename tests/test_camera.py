@@ -30,7 +30,10 @@ class FakeDecoder:
 
         def feed():
             for _ in range(self.frames):
-                os.write(self.w, bytes([100]) * size)
+                try:
+                    os.write(self.w, bytes([100]) * size)
+                except OSError:  # killed
+                    return
                 time.sleep(0.01)
 
         threading.Thread(target=feed, daemon=True).start()
@@ -99,6 +102,56 @@ class BatteryTest(CameraTestCase):
         for t in threads:
             t.join()
         self.assertEqual(errors, [])
+
+    def test_wake_entity_decides_reachable(self):
+        o = opts(wake_entity="binary_sensor.robot_away")
+        cam = camera.BatteryCamera(o["cameras"][0], o, None, QUIET)
+        with mock.patch.object(camera.socket, "create_connection", side_effect=AssertionError("no TCP probe")):
+            for state, awake in (("on", True), ("off", False), ("unavailable", False), (None, False)):
+                with self.subTest(state=state), mock.patch.object(camera, "ha_state", return_value=state):
+                    self.assertEqual(cam.reachable(), awake)
+
+    def test_wake_entity_off_closes_stream(self):
+        o = opts(wake_entity="binary_sensor.robot_away", probe_seconds=1)
+        cam = camera.BatteryCamera(o["cameras"][0], o, None, QUIET)
+        cam.alive, cam.proc = True, mock.Mock()
+        with mock.patch.object(camera, "ha_state", return_value=None):
+            cam._check_wake_entity()  # Home Assistant unreachable: keep streaming
+        cam.proc.kill.assert_not_called()
+        with mock.patch.object(camera, "ha_state", return_value="off"):
+            cam._check_wake_entity()  # within probe_seconds of the last check: skipped
+            cam.proc.kill.assert_not_called()
+            cam.wake_checked = 0.0
+            cam._check_wake_entity()
+        cam.proc.kill.assert_called_once()
+
+    def test_wake_entity_ends_a_wake_that_never_stalls(self):
+        class EndlessDecoder(FakeDecoder):
+            frames = 1000
+
+        o = opts(wake_entity="binary_sensor.robot_away", probe_seconds=0.5)
+        cam = camera.BatteryCamera(o["cameras"][0], o, None, QUIET)
+        t = time.monotonic()
+        state = lambda entity: "on" if time.monotonic() - t < 0.5 else "off"  # noqa: E731
+        threading.Thread(target=cam._tick, daemon=True).start()
+        with (
+            mock.patch.object(camera, "STALL", 30),
+            mock.patch.object(camera, "ha_state", side_effect=state),
+            mock.patch.object(camera.subprocess, "Popen", EndlessDecoder),
+        ):
+            cam.stream(t)
+        self.assertLess(time.monotonic() - t, 3)  # closed by the entity, not a stall
+        self.assertFalse(cam.alive)
+        self.assertEqual(cam.wakes, 1)
+        self.assertEqual(cam.frame[0], camera.DIM[100])
+
+    def test_ha_state(self):
+        reply = io.BytesIO(b'{"entity_id": "binary_sensor.robot_away", "state": "on"}')
+        with mock.patch.object(camera.urllib.request, "urlopen", return_value=reply) as urlopen:
+            self.assertEqual(camera.ha_state("binary_sensor.robot_away"), "on")
+        self.assertTrue(urlopen.call_args[0][0].full_url.endswith("/core/api/states/binary_sensor.robot_away"))
+        with mock.patch.object(camera.urllib.request, "urlopen", side_effect=OSError("down")):
+            self.assertIsNone(camera.ha_state("binary_sensor.robot_away"))
 
     def test_save_keeps_newest(self):
         o = opts(save_frames=True)

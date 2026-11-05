@@ -9,6 +9,7 @@ MOTIONS = ("pixels", "objects", "off")
 LABELS = ("person", "vehicle", "animal")
 NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
 MAC_RE = re.compile(r"^([0-9a-f]{2}:){5}[0-9a-f]{2}$")
+ENTITY_RE = re.compile(r"^[a-z0-9_]+\.[a-z0-9_]+$")
 
 DEFAULTS = {"rtsp_port": 8564, "api_port": 1985}
 CAMERA_DEFAULTS = {
@@ -24,6 +25,7 @@ CAMERA_DEFAULTS = {
     "max_area": 60.0,
     "hold_seconds": 10,
     "probe_seconds": 2.0,
+    "wake_entity": "",
     "width": 1280,
     "height": 720,
     "fps": 15,
@@ -83,6 +85,11 @@ def _check(cam):
         raise ConfigError(f"camera {name}: unknown labels {bad}; use {', '.join(LABELS)}")
     if cam["mac"] and not MAC_RE.match(cam["mac"]):
         raise ConfigError(f"camera {name}: mac must look like 02:00:00:00:00:01")
+    if cam["wake_entity"]:
+        if not ENTITY_RE.match(cam["wake_entity"]):
+            raise ConfigError(f"camera {name}: wake_entity must be an entity id like binary_sensor.robot_away")
+        if cam["mode"] != "battery":
+            raise ConfigError(f"camera {name}: wake_entity only works in battery mode")
 
 
 def _unique(values, what):

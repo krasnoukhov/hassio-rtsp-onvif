@@ -35,6 +35,14 @@ class ParseTest(unittest.TestCase):
             with self.subTest(bad=bad), self.assertRaises(config.ConfigError):
                 config.parse({"cameras": [bad]})
 
+    def test_wake_entity(self):
+        c = config.parse({"cameras": [cam(mode="battery", wake_entity="binary_sensor.robot_away")]})["cameras"][0]
+        self.assertEqual(c["wake_entity"], "binary_sensor.robot_away")
+        self.assertEqual(config.parse({"cameras": [cam()]})["cameras"][0]["wake_entity"], "")
+        for bad in (cam(mode="battery", wake_entity="robot away"), cam(wake_entity="binary_sensor.robot_away")):
+            with self.subTest(bad=bad), self.assertRaises(config.ConfigError):
+                config.parse({"cameras": [bad]})
+
     def test_rejects_duplicates(self):
         with self.assertRaises(config.ConfigError):
             config.parse({"cameras": [cam(), cam(onvif_port=8001)]})
