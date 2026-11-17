@@ -1,4 +1,4 @@
-FROM python:3.12-slim-trixie
+FROM python:3.15-slim-trixie
 
 ARG BUILD_ARCH=amd64
 ARG BUILD_VERSION=dev
